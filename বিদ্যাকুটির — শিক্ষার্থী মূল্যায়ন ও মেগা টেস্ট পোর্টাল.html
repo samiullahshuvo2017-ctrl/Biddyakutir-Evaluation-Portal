@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>বিদ্যাকুটির — শিক্ষার্থী মূল্যায়ন ও মেগা টেস্ট পোর্টাল</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Hind Siliguri', 'Inter', sans-serif;
+      background-color: #f4f7fa;
+      color: #1e293b;
+    }
+    .tab-btn.active {
+      background-color: #1e4e79;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(30, 78, 121, 0.25);
+    }
+    .score-pill {
+      transition: all 0.15s ease;
+    }
+    @media print {
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      #print-area {
+        box-shadow: none !important;
+        border: 2px solid #1e4e79 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 18px !important;
+      }
+      .print-break-avoid {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 no-print"></div>
+
+  <!-- Top Header -->
+  <header class="bg-[#1e4e79] text-white shadow-md no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center font-bold text-lg border border-white/25">
+          বি
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold leading-tight">বিদ্যাকুটির (Biddyakutir)</h1>
+          <p class="text-xs text-blue-100">সাপ্তাহিক মূল্যায়ন, মেগা টেস্ট ও রিপোর্ট কার্ড সিস্টেম</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <a href="https://docs.google.com/spreadsheets/d/1OCAZ_RW9bZyHp409_RPBoQg2cASPrrjD-vUhRne-v-U/edit" target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-medium transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          গুগল শিট খুলুন
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-[#163b5c] border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-2 overflow-x-auto">
+        <button type="button" data-tab="weekly" class="tab-btn active whitespace-nowrap px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition">
+          সাপ্তাহিক মূল্যায়ন এন্ট্রি
+        </button>
+        <button type="button" data-tab="megatest" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition">
+          মেগা টেস্ট ফলাফল
+        </button>
+        <button type="button" data-tab="report" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition">
+          রিপোর্ট কার্ড (PDF/Print)
+        </button>
+        <button type="button" data-tab="dashboard" class="tab-btn whitespace-nowrap px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition">
+          ড্যাশবোর্ড ও গুগল শিট সিঙ্ক
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- TAB 1: WEEKLY EVALUATION ENTRY -->
+    <section id="tab-weekly" class="tab-panel space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">সাপ্তাহিক শিক্ষার্থী মূল্যায়ন এন্ট্রি</h2>
+            <p class="text-xs sm:text-sm text-slate-500">শ্রেণি, বিভাগ ও বিষয় নির্বাচন করে একসাথে পুরো ব্যাচের উপস্থিতি, বাড়ির কাজ, শ্রেণির কাজ ও মনোযোগ নম্বর দিন।</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-blue-50 text-[#1e4e79] text-xs font-semibold border border-blue-200">
+            মোট নম্বর: ২০ (প্রতিটি ৫ করে)
+          </span>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 mb-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">শিক্ষকের নাম</label>
+            <select id="wk-teacher" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">তারিখ</label>
+            <input type="date" id="wk-date" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">সপ্তাহ</label>
+            <select id="wk-week" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none">
+              <option value="Week 1">Week 1 (১ম সপ্তাহ)</option>
+              <option value="Week 2">Week 2 (২য় সপ্তাহ)</option>
+              <option value="Week 3">Week 3 (৩য় সপ্তাহ)</option>
+              <option value="Week 4">Week 4 (৪র্থ সপ্তাহ)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">শ্রেণি (Class)</label>
+            <select id="wk-class" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">বিভাগ (Group)</label>
+            <select id="wk-group" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">বিষয় (Subject)</label>
+            <select id="wk-subject" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+          </div>
+        </div>
+
+        <!-- Batch Action Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+          <div class="text-sm font-semibold text-slate-700">
+            শিক্ষার্থী সংখ্যা: <span id="wk-student-count" class="text-[#1e4e79]">0</span> জন
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="wk-mark-all-present" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition">
+              সবাইকে Present ও Complete দিন
+            </button>
+            <button type="button" id="wk-save-btn" class="px-4 py-2 rounded-xl bg-[#1e4e79] hover:bg-[#163b5c] text-white text-sm font-semibold shadow-sm transition">
+              মূল্যায়ন সংরক্ষণ করুন
+            </button>
+          </div>
+        </div>
+
+        <!-- Student Evaluation Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600">
+                <th class="py-2.5 px-3">আইডি / রোল</th>
+                <th class="py-2.5 px-3">শিক্ষার্থীর নাম</th>
+                <th class="py-2.5 px-3">উপস্থিতি (৫)</th>
+                <th class="py-2.5 px-3">বাড়ির কাজ (৫)</th>
+                <th class="py-2.5 px-3">শ্রেণির কাজ (৫)</th>
+                <th class="py-2.5 px-3">মনোযোগ (৫)</th>
+                <th class="py-2.5 px-3 text-center">মোট (২০)</th>
+                <th class="py-2.5 px-3">মন্তব্য</th>
+              </tr>
+            </thead>
+            <tbody id="wk-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Saved Weekly Entries -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <h3 class="text-base font-bold text-slate-800">সংরক্ষিত সাপ্তাহিক মূল্যায়ন রেকর্ড</h3>
+          <button type="button" id="export-weekly-csv" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
+            Google Sheet-এর জন্য CSV ডাউনলোড
+          </button>
+        </div>
+        <div class="overflow-x-auto max-h-72 overflow-y-auto">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead class="bg-slate-50 sticky top-0 border-b border-slate-200 text-slate-600">
+              <tr>
+                <th class="py-2 px-3">তারিখ ও সপ্তাহ</th>
+                <th class="py-2 px-3">শ্রেণি ও বিষয়</th>
+                <th class="py-2 px-3">শিক্ষার্থী</th>
+                <th class="py-2 px-3">উপস্থিতি</th>
+                <th class="py-2 px-3">বাড়ির কাজ</th>
+                <th class="py-2 px-3">শ্রেণির কাজ</th>
+                <th class="py-2 px-3">মনোযোগ</th>
+                <th class="py-2 px-3 text-center">স্কোর</th>
+              </tr>
+            </thead>
+            <tbody id="wk-saved-body" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: MEGA TEST ENTRY -->
+    <section id="tab-megatest" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">মেগা টেস্ট ফলাফল এন্ট্রি</h2>
+            <p class="text-xs sm:text-sm text-slate-500">নম্বর ইনপুট দিলে শতাংশ (%), বাংলাদেশ বোর্ড গ্রেড (A+ থেকে F) এবং GPA স্বয়ংক্রিয়ভাবে হিসাব হবে।</p>
+          </div>
+          <button type="button" id="export-mega-csv" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
+            Mega Test CSV ডাউনলোড
+          </button>
+        </div>
+
+        <!-- Mega Test Filter Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 mb-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">পরীক্ষার নাম</label>
+            <input type="text" id="mt-exam-name" value="Mega Test - Nov 2026" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">তারিখ</label>
+            <input type="date" id="mt-date" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">শ্রেণি (Class)</label>
+            <select id="mt-class" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">বিভাগ (Group)</label>
+            <select id="mt-group" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">বিষয় (Subject)</label>
+            <select id="mt-subject" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">পূর্ণমান (Full Marks)</label>
+            <input type="number" id="mt-full-marks" value="25" min="1" max="200" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+          <div class="text-sm font-semibold text-slate-700">
+            শিক্ষার্থী সংখ্যা: <span id="mt-student-count" class="text-[#1e4e79]">0</span> জন
+          </div>
+          <button type="button" id="mt-save-btn" class="px-4 py-2 rounded-xl bg-[#1e4e79] hover:bg-[#163b5c] text-white text-sm font-semibold shadow-sm transition">
+            মেগা টেস্ট নম্বর সংরক্ষণ করুন
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600">
+                <th class="py-2.5 px-3">রোল</th>
+                <th class="py-2.5 px-3">শিক্ষার্থীর নাম</th>
+                <th class="py-2.5 px-3">উপস্থিতি</th>
+                <th class="py-2.5 px-3">প্রাপ্ত নম্বর</th>
+                <th class="py-2.5 px-3 text-center">শতাংশ (%)</th>
+                <th class="py-2.5 px-3 text-center">গ্রেড</th>
+                <th class="py-2.5 px-3 text-center">GPA</th>
+                <th class="py-2.5 px-3">মন্তব্য</th>
+              </tr>
+            </thead>
+            <tbody id="mt-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: PRINTABLE REPORT CARD (PDF) -->
+    <section id="tab-report" class="tab-panel hidden space-y-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 no-print">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 flex-1">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">শ্রেণি</label>
+              <select id="rc-class" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">বিভাগ</label>
+              <select id="rc-group" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">শিক্ষার্থী নির্বাচন করুন</label>
+              <select id="rc-student" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">মাস</label>
+              <input type="text" id="rc-month" value="নভেম্বর ২০২৬" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none" />
+            </div>
+          </div>
+          <button type="button" id="print-report-btn" class="px-5 py-2.5 rounded-xl bg-[#1e4e79] hover:bg-[#163b5c] text-white text-sm font-semibold shadow-sm inline-flex items-center gap-2 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            প্রিন্ট / PDF সেভ করুন
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable A4 Report Card -->
+      <div id="print-area" class="bg-white rounded-2xl shadow-md border-2 border-[#1e4e79] max-w-4xl mx-auto p-6 sm:p-8">
+        <!-- Institute Header -->
+        <div class="text-center border-b-2 border-[#1e4e79] pb-4 mb-5">
+          <div class="inline-block px-3 py-0.5 rounded-full bg-[#1e4e79] text-white text-xs font-semibold mb-1.5">
+            সাপ্তাহিক ও মাসিক শিক্ষার্থী মূল্যায়ন এবং মেগা টেস্ট রিপোর্ট কার্ড
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-[#1e4e79]">বিদ্যাকুটির (BIDDYAKUTIR)</h2>
+          <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+            ৩য় তলা, শেখ আবুল হাসেম কমপ্লেক্স, মাওয়া বাজার, লৌহজং, মুন্সিগঞ্জ | মোবাইল: +880 1756-869925
+          </p>
+        </div>
+
+        <!-- Student Details Box -->
+        <div id="rc-student-info" class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5 text-xs sm:text-sm"></div>
+
+        <!-- Section 1: Weekly & Monthly Evaluation -->
+        <div class="mb-6 print-break-avoid">
+          <h3 class="text-sm sm:text-base font-bold text-[#1e4e79] border-l-4 border-[#1e4e79] pl-2.5 mb-2.5">
+            ১. সাপ্তাহিক ও মাসিক শ্রেণি মূল্যায়ন বিবরণী
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-slate-300 text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-[#e8f0f8] text-[#1e4e79]">
+                  <th class="border border-slate-300 py-2 px-2.5 text-left">সপ্তাহ / তারিখ</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-left">বিষয়</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">উপস্থিতি (৫)</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">বাড়ির কাজ (৫)</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">শ্রেণির কাজ (৫)</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">মনোযোগ (৫)</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">মোট (২০)</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">শতাংশ</th>
+                </tr>
+              </thead>
+              <tbody id="rc-weekly-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 2: Mega Test Results -->
+        <div class="mb-6 print-break-avoid">
+          <h3 class="text-sm sm:text-base font-bold text-[#1e4e79] border-l-4 border-[#1e4e79] pl-2.5 mb-2.5">
+            ২. মেগা টেস্ট ফলাফল
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-slate-300 text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-[#e8f0f8] text-[#1e4e79]">
+                  <th class="border border-slate-300 py-2 px-2.5 text-left">পরীক্ষার নাম</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-left">বিষয়</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">পূর্ণমান</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">প্রাপ্ত নম্বর</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">শতাংশ (%)</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">গ্রেড</th>
+                  <th class="border border-slate-300 py-2 px-2.5 text-center">GPA</th>
+                </tr>
+              </thead>
+              <tbody id="rc-mega-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Overall Summary & Signatures -->
+        <div id="rc-summary-box" class="bg-blue-50/70 border border-blue-200 rounded-xl p-4 mb-8 text-xs sm:text-sm print-break-avoid"></div>
+
+        <div class="grid grid-cols-3 gap-6 pt-6 text-center text-xs sm:text-sm text-slate-700 print-break-avoid">
+          <div>
+            <div class="border-t border-slate-400 pt-1.5 mx-2">শ্রেণি শিক্ষকের স্বাক্ষর</div>
+          </div>
+          <div>
+            <div class="border-t border-slate-400 pt-1.5 mx-2">অভিভাবকের স্বাক্ষর</div>
+          </div>
+          <div>
+            <div class="border-t border-slate-400 pt-1.5 mx-2 font-semibold text-[#1e4e79]">পরিচালক, বিদ্যাকুটির</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: DASHBOARD & GOOGLE SHEETS SYNC -->
+    <section id="tab-dashboard" class="tab-panel hidden space-y-5">
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+          <p class="text-xs font-semibold text-slate-500">মোট নিবন্ধিত শিক্ষার্থী</p>
+          <p id="kpi-students" class="text-2xl font-bold text-[#1e4e79] mt-1">0</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+          <p class="text-xs font-semibold text-slate-500">সাপ্তাহিক মূল্যায়ন এন্ট্রি</p>
+          <p id="kpi-weekly" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+          <p class="text-xs font-semibold text-slate-500">মেগা টেস্ট এন্ট্রি</p>
+          <p id="kpi-mega" class="text-2xl font-bold text-indigo-600 mt-1">0</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+          <p class="text-xs font-semibold text-slate-500">গড় সাপ্তাহিক স্কোর</p>
+          <p id="kpi-avg-weekly" class="text-2xl font-bold text-amber-600 mt-1">0%</p>
+        </div>
+      </div>
+
+      <!-- Chart & Sync Guide -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <h3 class="text-base font-bold text-slate-800 mb-3">শ্রেণিভিত্তিক শিক্ষার্থী সংখ্যা</h3>
+          <div class="relative h-72">
+            <canvas id="classChart"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-800">গুগল শিট ও অটোমেটেড সিঙ্ক নির্দেশিকা</h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1">
+              আপনার ২২ জন শিক্ষক এই ওয়েব পোর্টাল থেকে ডেটা এন্ট্রি করে সরাসরি নিচের বাটন থেকে CSV ডাউনলোড করে গুগল শিটে পেস্ট করতে পারেন, অথবা নিচের Apps Script কোডটি গুগল শিটে বসিয়ে সরাসরি লাইভ API সিঙ্ক চালু করতে পারেন।
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <a href="https://docs.google.com/spreadsheets/d/1OCAZ_RW9bZyHp409_RPBoQg2cASPrrjD-vUhRne-v-U/edit" target="_blank" rel="noopener noreferrer"
+               class="px-3.5 py-2 rounded-xl bg-[#1e4e79] hover:bg-[#163b5c] text-white text-xs font-semibold transition">
+              গুগল শিট ডেটাবেস খুলুন
+            </a>
+            <button type="button" id="dash-export-weekly" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
+              Weekly CSV ডাউনলোড
+            </button>
+            <button type="button" id="dash-export-mega" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition">
+              Mega Test CSV ডাউনলোড
+            </button>
+          </div>
+
+          <div class="bg-slate-900 text-slate-100 rounded-xl p-3 text-xs font-mono relative">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-emerald-400 font-semibold">Google Apps Script (Web App Webhook)</span>
+              <button type="button" id="copy-apps-script" class="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white text-xs transition">
+                কোড কপি করুন
+              </button>
+            </div>
+            <pre id="apps-script-code" class="overflow-x-auto whitespace-pre-wrap text-[11px] leading-relaxed">function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(data.sheetName);
+  data.rows.forEach(function(row) { sheet.appendRow(row); });
+  return ContentService.createTextOutput(JSON.stringify({status: "ok"}))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ====== 1. GROUNDED DATA FROM VIDYAKUTIR MEGA TEST RESULT SHEET ======
+    const CLASS_CONFIG = {
+      "Six": {
+        groups: ["General"],
+        subjects: { "General": ["English", "Math", "Bangla", "Science", "BGS", "Agriculture"] }
+      },
+      "Seven": {
+        groups: ["General"],
+        subjects: { "General": ["English", "Math", "Bangla", "Science", "BGS", "Agriculture"] }
+      },
+      "Eight": {
+        groups: ["General"],
+        subjects: { "General": ["English", "Math", "Bangla", "Science", "BGS", "Agriculture"] }
+      },
+      "Nine": {
+        groups: ["Science", "Business Studies", "Humanities"],
+        subjects: {
+          "Science": ["Eng", "Math", "Ban", "Sci", "Che", "Bio", "Phy", "H.M"],
+          "Business Studies": ["Eng", "Math", "Ban", "Sci", "Acc", "Fin", "B.En"],
+          "Humanities": ["Eng", "Math", "Ban", "Sci", "His", "Civ", "Geo", "Eco"]
+        }
+      },
+      "Ten": {
+        groups: ["Science", "Business Studies", "Humanities"],
+        subjects: {
+          "Science": ["Eng", "Math", "Ban", "Sci", "Che", "Bio", "Phy", "H.M"],
+          "Business Studies": ["Eng", "Math", "Ban", "Sci", "Acc", "Fin", "B.En"],
+          "Humanities": ["Eng", "Math", "Ban", "Sci", "His", "Civ", "Geo", "Eco"]
+        }
+      },
+      "SSC-27": {
+        groups: ["Science", "Business Studies", "Humanities"],
+        subjects: {
+          "Science": ["Eng", "Math", "Ban", "Che", "Bio", "Phy", "H.M"],
+          "Business Studies": ["Eng", "Math", "Ban", "Acc", "Fin", "B.En"],
+          "Humanities": ["Eng", "Math", "Ban", "His", "Civ", "Geo", "Eco"]
+        }
+      },
+      "Eleven": {
+        groups: ["Science", "Business Studies", "Humanities"],
+        subjects: {
+          "Science": ["Eng", "Ict", "Ban", "Che", "Bio", "Phy", "H.M"],
+          "Business Studies": ["Eng", "Ict", "Ban", "Acc", "Fin", "B.En"],
+          "Humanities": ["Eng", "Ict", "Ban", "His", "Civ", "I.His", "Eco"]
+        }
+      },
+      "Twelve": {
+        groups: ["Science", "Business Studies", "Humanities"],
+        subjects: {
+          "Science": ["Eng", "Ict", "Ban", "Che", "Bio", "Phy", "H.M"],
+          "Business Studies": ["Eng", "Ict", "Ban", "Acc", "Fin", "B.En"],
+          "Humanities": ["Eng", "Ict", "Ban", "His", "Civ", "I.His", "Eco"]
+        }
+      }
+    };
+
+    const TEACHERS = Array.from({ length: 22 }, (_, i) => `Teacher ${String(i + 1).padStart(2, '0')}`);
+
+    const STUDENTS = [{"id": "VK-06-01", "roll": 1, "name": "Afrin Jahan", "cls": "Six", "grp": "General"}, {"id": "VK-06-02", "roll": 2, "name": "Maisha Islam", "cls": "Six", "grp": "General"}, {"id": "VK-06-03", "roll": 3, "name": "Tahomid Khan", "cls": "Six", "grp": "General"}, {"id": "VK-06-04", "roll": 4, "name": "Shifa Akter", "cls": "Six", "grp": "General"}, {"id": "VK-06-05", "roll": 5, "name": "Yanur Khan", "cls": "Six", "grp": "General"}, {"id": "VK-06-06", "roll": 6, "name": "Rafin Sheikh", "cls": "Six", "grp": "General"}, {"id": "VK-06-07", "roll": 7, "name": "Omor Faruk", "cls": "Six", "grp": "General"}, {"id": "VK-06-08", "roll": 8, "name": "Anik Sheikh", "cls": "Six", "grp": "General"}, {"id": "VK-06-09", "roll": 9, "name": "Raisa Rohana", "cls": "Six", "grp": "General"}, {"id": "VK-06-10", "roll": 10, "name": "Ramisa", "cls": "Six", "grp": "General"}, {"id": "VK-06-11", "roll": 11, "name": "Jannatul Ferdouse", "cls": "Six", "grp": "General"}, {"id": "VK-06-12", "roll": 12, "name": "Salman", "cls": "Six", "grp": "General"}, {"id": "VK-06-13", "roll": 13, "name": "Siam", "cls": "Six", "grp": "General"}, {"id": "VK-06-14", "roll": 14, "name": "Eshita", "cls": "Six", "grp": "General"}, {"id": "VK-06-15", "roll": 15, "name": "Mahim Islam Niloy", "cls": "Six", "grp": "General"}, {"id": "VK-06-16", "roll": 16, "name": "Galib Khan", "cls": "Six", "grp": "General"}, {"id": "VK-06-17", "roll": 17, "name": "Busra", "cls": "Six", "grp": "General"}, {"id": "VK-06-18", "roll": 18, "name": "Toasa", "cls": "Six", "grp": "General"}, {"id": "VK-06-19", "roll": 19, "name": "Sara", "cls": "Six", "grp": "General"}, {"id": "VK-06-20", "roll": 20, "name": "Deep Das", "cls": "Six", "grp": "General"}, {"id": "VK-06-21", "roll": 21, "name": "Yasfin", "cls": "Six", "grp": "General"}, {"id": "VK-06-22", "roll": 22, "name": "Prottoy", "cls": "Six", "grp": "General"}, {"id": "VK-06-23", "roll": 23, "name": "Araf", "cls": "Six", "grp": "General"}, {"id": "VK-07-01", "roll": 1, "name": "Nusrat", "cls": "Seven", "grp": "General"}, {"id": "VK-07-02", "roll": 2, "name": "Mahamudul Hasan", "cls": "Seven", "grp": "General"}, {"id": "VK-07-03", "roll": 3, "name": "Nahian", "cls": "Seven", "grp": "General"}, {"id": "VK-07-04", "roll": 4, "name": "Sheikh Jamil", "cls": "Seven", "grp": "General"}, {"id": "VK-07-05", "roll": 5, "name": "Jamila", "cls": "Seven", "grp": "General"}, {"id": "VK-07-06", "roll": 6, "name": "Akash", "cls": "Seven", "grp": "General"}, {"id": "VK-07-07", "roll": 7, "name": "Tonni", "cls": "Seven", "grp": "General"}, {"id": "VK-07-08", "roll": 8, "name": "Sabid", "cls": "Seven", "grp": "General"}, {"id": "VK-07-09", "roll": 9, "name": "Samiha Akter", "cls": "Seven", "grp": "General"}, {"id": "VK-07-10", "roll": 10, "name": "Sohana Islam", "cls": "Seven", "grp": "General"}, {"id": "VK-07-11", "roll": 11, "name": "Nusrat Jahan", "cls": "Seven", "grp": "General"}, {"id": "VK-07-12", "roll": 12, "name": "Karima", "cls": "Seven", "grp": "General"}, {"id": "VK-07-13", "roll": 13, "name": "Ayat", "cls": "Seven", "grp": "General"}, {"id": "VK-08-01", "roll": 1, "name": "Oishi Moni", "cls": "Eight", "grp": "General"}, {"id": "VK-08-02", "roll": 2, "name": "Noumi", "cls": "Eight", "grp": "General"}, {"id": "VK-08-03", "roll": 3, "name": "Nusrat", "cls": "Eight", "grp": "General"}, {"id": "VK-08-04", "roll": 4, "name": "Mim", "cls": "Eight", "grp": "General"}, {"id": "VK-08-05", "roll": 5, "name": "Sadika Islam Safa", "cls": "Eight", "grp": "General"}, {"id": "VK-08-06", "roll": 6, "name": "Nirob", "cls": "Eight", "grp": "General"}, {"id": "VK-08-07", "roll": 7, "name": "Anta Akter", "cls": "Eight", "grp": "General"}, {"id": "VK-08-08", "roll": 8, "name": "Samiul", "cls": "Eight", "grp": "General"}, {"id": "VK-08-09", "roll": 9, "name": "Nibir", "cls": "Eight", "grp": "General"}, {"id": "VK-08-10", "roll": 10, "name": "Rayan (Can)", "cls": "Eight", "grp": "General"}, {"id": "VK-08-11", "roll": 11, "name": "Sarika Dhali", "cls": "Eight", "grp": "General"}, {"id": "VK-08-12", "roll": 12, "name": "Tawhid Mridha", "cls": "Eight", "grp": "General"}, {"id": "VK-08-13", "roll": 13, "name": "Fahim Islam Nishu", "cls": "Eight", "grp": "General"}, {"id": "VK-08-14", "roll": 14, "name": "Efaz", "cls": "Eight", "grp": "General"}, {"id": "VK-08-15", "roll": 15, "name": "Promit", "cls": "Eight", "grp": "General"}, {"id": "VK-08-16", "roll": 16, "name": "Suborna", "cls": "Eight", "grp": "General"}, {"id": "VK-08-17", "roll": 17, "name": "Abdullah", "cls": "Eight", "grp": "General"}, {"id": "VK-08-18", "roll": 18, "name": "Abdullah Salman", "cls": "Eight", "grp": "General"}, {"id": "VK-08-19", "roll": 19, "name": "Raiyan Khan", "cls": "Eight", "grp": "General"}, {"id": "VK-08-20", "roll": 20, "name": "Saniya Shahin", "cls": "Eight", "grp": "General"}, {"id": "VK-08-21", "roll": 21, "name": "Moriom", "cls": "Eight", "grp": "General"}, {"id": "VK-08-22", "roll": 22, "name": "Sazzad", "cls": "Eight", "grp": "General"}, {"id": "VK-08-23", "roll": 23, "name": "Md. Nur", "cls": "Eight", "grp": "General"}, {"id": "VK-08-24", "roll": 24, "name": "Khadiza", "cls": "Eight", "grp": "General"}, {"id": "VK-08-25", "roll": 25, "name": "Lamiya", "cls": "Eight", "grp": "General"}, {"id": "VK-08-26", "roll": 26, "name": "Sabbir", "cls": "Eight", "grp": "General"}, {"id": "VK-08-27", "roll": 27, "name": "Fariha", "cls": "Eight", "grp": "General"}, {"id": "VK-08-28", "roll": 28, "name": "Shaoly", "cls": "Eight", "grp": "General"}, {"id": "VK-08-29", "roll": 29, "name": "Jubayer", "cls": "Eight", "grp": "General"}, {"id": "VK-08-30", "roll": 30, "name": "Tora Sarkar", "cls": "Eight", "grp": "General"}, {"id": "VK-08-31", "roll": 31, "name": "Dithila Rani", "cls": "Eight", "grp": "General"}, {"id": "VK-09-01", "roll": 1, "name": "Mahadi Islam Shan", "cls": "Nine", "grp": "Science"}, {"id": "VK-09-02", "roll": 2, "name": "Niha", "cls": "Nine", "grp": "Science"}, {"id": "VK-09-03", "roll": 3, "name": "Junaira Anzum", "cls": "Nine", "grp": "Science"}, {"id": "VK-09-04", "roll": 4, "name": "Sharif Uddin", "cls": "Nine", "grp": "Science"}, {"id": "VK-09-05", "roll": 5, "name": "Samir", "cls": "Nine", "grp": "Science"}, {"id": "VK-09-06", "roll": 6, "name": "Sayem", "cls": "Nine", "grp": "Science"}, {"id": "VK-09-07", "roll": 7, "name": "Masum Billah", "cls": "Nine", "grp": "Science"}, {"id": "VK-09-08", "roll": 8, "name": "Md Sihab", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-09", "roll": 9, "name": "Yasin Bepari", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-10", "roll": 10, "name": "Jamila Binta Matin", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-11", "roll": 11, "name": "Fariha", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-12", "roll": 12, "name": "Kaniz Fatema", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-13", "roll": 13, "name": "Afifa Sikder", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-14", "roll": 14, "name": "Sinthiya", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-15", "roll": 15, "name": "Aysha Noor", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-16", "roll": 16, "name": "Sajjad Khan Ayon", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-17", "roll": 17, "name": "Khadija", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-18", "roll": 18, "name": "Tanisa Islam", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-19", "roll": 19, "name": "Himel", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-20", "roll": 20, "name": "Achiya", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-21", "roll": 21, "name": "Himel", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-22", "roll": 22, "name": "Tabchir Dhali", "cls": "Nine", "grp": "Business Studies"}, {"id": "VK-09-23", "roll": 23, "name": "Aliva Sheikh", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-24", "roll": 24, "name": "Mysha Akter", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-25", "roll": 25, "name": "Maliha Islam Roza", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-26", "roll": 26, "name": "Zihad", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-27", "roll": 27, "name": "Mahfuz", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-28", "roll": 28, "name": "Tahmid Ali", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-29", "roll": 29, "name": "Saif Dhali", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-30", "roll": 30, "name": "Abdullah Sheikh", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-31", "roll": 31, "name": "Junayed Islam", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-32", "roll": 32, "name": "Halima", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-33", "roll": 33, "name": "Md.Lingkon", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-34", "roll": 34, "name": "Rupa Akter", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-35", "roll": 35, "name": "Muntaha Sheikh", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-36", "roll": 36, "name": "Mariam", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-37", "roll": 37, "name": "Sidratul Muntaha", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-38", "roll": 38, "name": "Tuhin", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-39", "roll": 39, "name": "Megha Akter", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-40", "roll": 40, "name": "Rabeya Akter", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-41", "roll": 41, "name": "Snigdha Akter", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-42", "roll": 42, "name": "Anha", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-43", "roll": 43, "name": "Roshni", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-44", "roll": 44, "name": "Khadija Rohoman", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-45", "roll": 45, "name": "Talha Dewon", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-09-46", "roll": 46, "name": "Israt Jahan", "cls": "Nine", "grp": "Humanities"}, {"id": "VK-10-01", "roll": 1, "name": "Ismam Hossain", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-02", "roll": 2, "name": "Mahia Afrin Kotha", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-03", "roll": 3, "name": "Nasim Akon", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-04", "roll": 4, "name": "Sadia Akter", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-05", "roll": 5, "name": "Sara Akter", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-06", "roll": 6, "name": "Samia Shahin", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-07", "roll": 7, "name": "Rifan Uddin", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-08", "roll": 8, "name": "Sohoj", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-09", "roll": 9, "name": "Momo Dhali", "cls": "Ten", "grp": "Science"}, {"id": "VK-10-10", "roll": 10, "name": "Sheikh Alif", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-11", "roll": 11, "name": "Labiba Tasfi", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-12", "roll": 12, "name": "Salma Taslim Ridula", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-13", "roll": 13, "name": "Rahamatullah", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-14", "roll": 14, "name": "Hamim", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-15", "roll": 15, "name": "Maria Akter", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-16", "roll": 16, "name": "Al Jahin", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-17", "roll": 17, "name": "Nusrat Jahan Esha", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-18", "roll": 18, "name": "Fahim Khan", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-19", "roll": 19, "name": "Rihad Hossain", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-20", "roll": 20, "name": "Sajid Sheikh", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-21", "roll": 21, "name": "Samira Humaira Mim", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-22", "roll": 22, "name": "Ridin", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-23", "roll": 23, "name": "Roza", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-24", "roll": 24, "name": "Khadijatul Kobra", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-25", "roll": 25, "name": "Arnob Das", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-26", "roll": 26, "name": "Afrin Akter", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-27", "roll": 27, "name": "Simanto", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-28", "roll": 28, "name": "Nipun Das", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-29", "roll": 29, "name": "Tamim Islam", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-30", "roll": 30, "name": "Maisha Imran", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-31", "roll": 31, "name": "Mahfuz", "cls": "Ten", "grp": "Business Studies"}, {"id": "VK-10-32", "roll": 32, "name": "Sumaiya Akter", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-33", "roll": 33, "name": "Fatema Akter Arifa", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-34", "roll": 34, "name": "Indro Jit", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-35", "roll": 35, "name": "Fahima Akter", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-36", "roll": 36, "name": "Dola Moni", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-37", "roll": 37, "name": "Isma Islam", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-38", "roll": 38, "name": "Jahidul Hasan", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-39", "roll": 39, "name": "Tora Moni", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-40", "roll": 40, "name": "Riya Moni", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-41", "roll": 41, "name": "Rayhan", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-42", "roll": 42, "name": "Mahabub", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-43", "roll": 43, "name": "Sroddha", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-44", "roll": 44, "name": "Nibir Das", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-10-45", "roll": 45, "name": "Raufun", "cls": "Ten", "grp": "Humanities"}, {"id": "VK-12-01", "roll": 1, "name": "Faiza Zaman Fiha", "cls": "Twelve", "grp": "Science"}, {"id": "VK-12-02", "roll": 2, "name": "Mymona Islam", "cls": "Twelve", "grp": "Science"}, {"id": "VK-12-03", "roll": 3, "name": "Elma Ahamed", "cls": "Twelve", "grp": "Science"}, {"id": "VK-12-04", "roll": 4, "name": "Rabeya Islam Ruku", "cls": "Twelve", "grp": "Science"}, {"id": "VK-12-05", "roll": 5, "name": "Fatema Akter", "cls": "Twelve", "grp": "Science"}, {"id": "VK-12-06", "roll": 6, "name": "Oasfia Naznin", "cls": "Twelve", "grp": "Science"}, {"id": "VK-12-07", "roll": 7, "name": "Israt Jahan Antora", "cls": "Twelve", "grp": "Science"}, {"id": "VK-12-08", "roll": 8, "name": "Md. Nibir", "cls": "Twelve", "grp": "Business Studies"}, {"id": "VK-12-09", "roll": 9, "name": "Md Morshed Khan", "cls": "Twelve", "grp": "Business Studies"}, {"id": "VK-12-10", "roll": 10, "name": "Arafat Talukder", "cls": "Twelve", "grp": "Business Studies"}, {"id": "VK-12-11", "roll": 11, "name": "Bristy Akter", "cls": "Twelve", "grp": "Business Studies"}, {"id": "VK-12-12", "roll": 12, "name": "Md. Rachin", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-13", "roll": 13, "name": "Sajeda Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-14", "roll": 14, "name": "Aysha Uddin", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-15", "roll": 15, "name": "Afrin Usmita", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-16", "roll": 16, "name": "Anisha Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-17", "roll": 17, "name": "Jamiya Sarkar", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-18", "roll": 18, "name": "Faiza Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-19", "roll": 19, "name": "Anisha Islam Tisha", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-20", "roll": 20, "name": "Minha Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-21", "roll": 21, "name": "Ema Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-22", "roll": 22, "name": "Shakila Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-23", "roll": 23, "name": "Moriyom Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-24", "roll": 24, "name": "Raka", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-25", "roll": 25, "name": "Tinni Akter", "cls": "Twelve", "grp": "Humanities"}, {"id": "VK-12-26", "roll": 26, "name": "Sara Akter", "cls": "Twelve", "grp": "Humanities"}];
+
+    const DEFAULT_WEEKLY = [
+      { id: "WK-1001", date: "2026-11-11", week: "Week 2", cls: "Nine", grp: "Business Studies", studentId: "VK-09-17", studentName: "Khadija", subject: "Fin", teacher: "Teacher 01", att: "Present", hw: "Complete", cw: "Excellent", attn: "Very Attentive", total: 20, pct: 100, remarks: "অসাধারণ পারফরম্যান্স" },
+      { id: "WK-1002", date: "2026-11-11", week: "Week 2", cls: "Nine", grp: "Business Studies", studentId: "VK-09-12", studentName: "Kaniz Fatema", subject: "Fin", teacher: "Teacher 01", att: "Present", hw: "Complete", cw: "Good", attn: "Very Attentive", total: 19, pct: 95, remarks: "নিয়মিত মনোযোগী" },
+      { id: "WK-1003", date: "2026-11-11", week: "Week 2", cls: "Nine", grp: "Business Studies", studentId: "VK-09-13", studentName: "Afifa Sikder", subject: "Fin", teacher: "Teacher 01", att: "Present", hw: "Complete", cw: "Good", attn: "Attentive", total: 18, pct: 90, remarks: "ভালো উন্নতি করছে" }
+    ];
+
+    const DEFAULT_MEGA = [
+      { id: "MT-1001", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-17", studentName: "Khadija", subject: "Fin", full: 25, obtained: 24, att: "Present", pct: 96, grade: "A+", gpa: "5.00", remarks: "১ম স্থান" },
+      { id: "MT-1002", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-12", studentName: "Kaniz Fatema", subject: "Fin", full: 25, obtained: 19.5, att: "Present", pct: 78, grade: "A", gpa: "4.00", remarks: "২য় স্থান" },
+      { id: "MT-1003", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-13", studentName: "Afifa Sikder", subject: "Fin", full: 25, obtained: 17.5, att: "Present", pct: 70, grade: "A", gpa: "4.00", remarks: "৩য় স্থান" },
+      { id: "MT-1004", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-14", studentName: "Sinthiya", subject: "Fin", full: 25, obtained: 13, att: "Present", pct: 52, grade: "B", gpa: "3.00", remarks: "আরও অনুশীলন প্রয়োজন" },
+      { id: "MT-1005", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-11", studentName: "Fariha", subject: "Fin", full: 25, obtained: 9, att: "Present", pct: 36, grade: "D", gpa: "1.00", remarks: "বিশেষ যত্ন প্রয়োজন" },
+      { id: "MT-1006", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-09", studentName: "Yasin Bepari", subject: "Fin", full: 25, obtained: 7, att: "Present", pct: 28, grade: "F", gpa: "0.00", remarks: "অতিরিক্ত ক্লাস প্রয়োজন" },
+      { id: "MT-1007", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-18", studentName: "Tanisa Islam", subject: "Fin", full: 25, obtained: 4, att: "Present", pct: 16, grade: "F", gpa: "0.00", remarks: "৭ম স্থান" },
+      { id: "MT-1008", exam: "Mega Test - Nov 2026", date: "2026-11-11", cls: "Nine", grp: "Business Studies", studentId: "VK-09-22", studentName: "Tabchir Dhali", subject: "Fin", full: 25, obtained: 0, att: "Present", pct: 0, grade: "F", gpa: "0.00", remarks: "৮ম স্থান" }
+    ];
+
+    // ====== 2. STATE MANAGEMENT (with safe localStorage) ======
+    function loadState(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+    function saveState(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (e) {}
+    }
+
+    let weeklyRecords = loadState("vk_weekly_records", DEFAULT_WEEKLY);
+    let megaRecords = loadState("vk_mega_records", DEFAULT_MEGA);
+    let classChartInstance = null;
+
+    // Scoring maps
+    const ATT_SCORE = { "Present": 5, "Late": 3, "Absent": 0 };
+    const HW_SCORE = { "Complete": 5, "Incomplete": 3, "Not Done": 0 };
+    const CW_SCORE = { "Excellent": 5, "Good": 4, "Average": 3, "Needs Improvement": 1 };
+    const ATTN_SCORE = { "Very Attentive": 5, "Attentive": 4, "Distracted": 1 };
+
+    function getGradeAndGPA(pct) {
+      if (pct >= 80) return { grade: "A+", gpa: "5.00" };
+      if (pct >= 70) return { grade: "A", gpa: "4.00" };
+      if (pct >= 60) return { grade: "A-", gpa: "3.50" };
+      if (pct >= 50) return { grade: "B", gpa: "3.00" };
+      if (pct >= 40) return { grade: "C", gpa: "2.00" };
+      if (pct >= 33) return { grade: "D", gpa: "1.00" };
+      return { grade: "F", gpa: "0.00" };
+    }
+
+    function showToast(msg, type = "success") {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      const bg = type === "success" ? "bg-emerald-600" : type === "error" ? "bg-rose-600" : "bg-[#1e4e79]";
+      toast.className = `${bg} text-white px-4 py-2.5 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2 transition-opacity duration-300`;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+      }, 2800);
+    }
+
+    // ====== 3. POPULATE DROPDOWNS ======
+    function populateSelect(el, items) {
+      el.innerHTML = items.map(i => `<option value="${i}">${i}</option>`).join("");
+    }
+
+    function syncGroupAndSubject(clsEl, grpEl, subjEl, defaultCls = "Nine", defaultGrp = "Business Studies") {
+      populateSelect(clsEl, Object.keys(CLASS_CONFIG));
+      clsEl.value = defaultCls;
+
+      function updateGroups() {
+        const cfg = CLASS_CONFIG[clsEl.value];
+        populateSelect(grpEl, cfg.groups);
+        if (cfg.groups.includes(defaultGrp) && clsEl.value === defaultCls) {
+          grpEl.value = defaultGrp;
+        }
+        updateSubjects();
+      }
+
+      function updateSubjects() {
+        if (!subjEl) return;
+        const cfg = CLASS_CONFIG[clsEl.value];
+        const subjs = cfg.subjects[grpEl.value] || [];
+        populateSelect(subjEl, subjs);
+        if (subjs.includes("Fin")) subjEl.value = "Fin";
+      }
+
+      clsEl.addEventListener("change", updateGroups);
+      grpEl.addEventListener("change", updateSubjects);
+      updateGroups();
+    }
+
+    // ====== 4. WEEKLY EVALUATION LOGIC ======
+    function renderWeeklyTable() {
+      const cls = document.getElementById("wk-class").value;
+      const grp = document.getElementById("wk-group").value;
+      const filtered = STUDENTS.filter(s => s.cls === cls && s.grp === grp);
+      document.getElementById("wk-student-count").textContent = filtered.length;
+
+      const tbody = document.getElementById("wk-table-body");
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-400">এই শ্রেণি/বিভাগে কোনো শিক্ষার্থী পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(s => `
+        <tr data-sid="${s.id}" data-sname="${s.name}" class="hover:bg-slate-50">
+          <td class="py-2.5 px-3 font-mono text-xs text-slate-500">${s.id} (Roll ${s.roll})</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-800">${s.name}</td>
+          <td class="py-2.5 px-3">
+            <select class="wk-att rounded-lg border border-slate-300 px-2 py-1 text-xs w-full">
+              <option value="Present">Present (5)</option>
+              <option value="Late">Late (3)</option>
+              <option value="Absent">Absent (0)</option>
+            </select>
+          </td>
+          <td class="py-2.5 px-3">
+            <select class="wk-hw rounded-lg border border-slate-300 px-2 py-1 text-xs w-full">
+              <option value="Complete">Complete (5)</option>
+              <option value="Incomplete">Incomplete (3)</option>
+              <option value="Not Done">Not Done (0)</option>
+            </select>
+          </td>
+          <td class="py-2.5 px-3">
+            <select class="wk-cw rounded-lg border border-slate-300 px-2 py-1 text-xs w-full">
+              <option value="Excellent">Excellent (5)</option>
+              <option value="Good">Good (4)</option>
+              <option value="Average">Average (3)</option>
+              <option value="Needs Improvement">Needs Imp. (1)</option>
+            </select>
+          </td>
+          <td class="py-2.5 px-3">
+            <select class="wk-attn rounded-lg border border-slate-300 px-2 py-1 text-xs w-full">
+              <option value="Very Attentive">Very Attentive (5)</option>
+              <option value="Attentive">Attentive (4)</option>
+              <option value="Distracted">Distracted (1)</option>
+            </select>
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <span class="wk-row-score inline-block px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1e4e79] font-bold text-xs">20 / 20</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <input type="text" class="wk-rem rounded-lg border border-slate-300 px-2 py-1 text-xs w-full" placeholder="মন্তব্য..." />
+          </td>
+        </tr>
+      `).join("");
+
+      tbody.querySelectorAll("select").forEach(sel => {
+        sel.addEventListener("change", e => updateWeeklyRowScore(e.target.closest("tr")));
+      });
+    }
+
+    function updateWeeklyRowScore(tr) {
+      const att = tr.querySelector(".wk-att").value;
+      const hw = tr.querySelector(".wk-hw").value;
+      const cw = tr.querySelector(".wk-cw").value;
+      const attn = tr.querySelector(".wk-attn").value;
+      const total = ATT_SCORE[att] + HW_SCORE[hw] + CW_SCORE[cw] + ATTN_SCORE[attn];
+      const badge = tr.querySelector(".wk-row-score");
+      badge.textContent = `${total} / 20`;
+      badge.className = total >= 16
+        ? "wk-row-score inline-block px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs"
+        : total >= 10
+        ? "wk-row-score inline-block px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold text-xs"
+        : "wk-row-score inline-block px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 font-bold text-xs";
+    }
+
+    function renderSavedWeekly() {
+      const tbody = document.getElementById("wk-saved-body");
+      const recent = [...weeklyRecords].reverse().slice(0, 30);
+      tbody.innerHTML = recent.map(r => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-2 px-3 text-slate-600">${r.date} • ${r.week}</td>
+          <td class="py-2 px-3 font-medium">${r.cls} (${r.subject})</td>
+          <td class="py-2 px-3 font-semibold text-slate-800">${r.studentName}</td>
+          <td class="py-2 px-3">${r.att}</td>
+          <td class="py-2 px-3">${r.hw}</td>
+          <td class="py-2 px-3">${r.cw}</td>
+          <td class="py-2 px-3">${r.attn}</td>
+          <td class="py-2 px-3 text-center font-bold text-[#1e4e79]">${r.total}/20 (${r.pct}%)</td>
+        </tr>
+      `).join("");
+    }
+
+    // ====== 5. MEGA TEST LOGIC ======
+    function renderMegaTable() {
+      const cls = document.getElementById("mt-class").value;
+      const grp = document.getElementById("mt-group").value;
+      const subj = document.getElementById("mt-subject").value;
+      const full = Number(document.getElementById("mt-full-marks").value) || 25;
+      const filtered = STUDENTS.filter(s => s.cls === cls && s.grp === grp);
+      document.getElementById("mt-student-count").textContent = filtered.length;
+
+      const tbody = document.getElementById("mt-table-body");
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-400">এই শ্রেণি/বিভাগে কোনো শিক্ষার্থী পাওয়া যায়নি।</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(s => {
+        const existing = megaRecords.find(m => m.studentId === s.id && m.subject === subj);
+        const val = existing ? existing.obtained : "";
+        const att = existing ? existing.att : "Present";
+        const rem = existing ? existing.remarks : "";
+        const pct = val !== "" ? Math.round((Number(val) / full) * 100) : 0;
+        const { grade, gpa } = val !== "" ? getGradeAndGPA(pct) : { grade: "-", gpa: "-" };
+        return `
+          <tr data-sid="${s.id}" data-sname="${s.name}" class="hover:bg-slate-50">
+            <td class="py-2.5 px-3 font-mono text-xs text-slate-500">${s.roll}</td>
+            <td class="py-2.5 px-3 font-semibold text-slate-800">${s.name}</td>
+            <td class="py-2.5 px-3">
+              <select class="mt-att rounded-lg border border-slate-300 px-2 py-1 text-xs">
+                <option value="Present" ${att === "Present" ? "selected" : ""}>Present</option>
+                <option value="Absent" ${att === "Absent" ? "selected" : ""}>Absent</option>
+              </select>
+            </td>
+            <td class="py-2.5 px-3">
+              <input type="number" step="0.5" min="0" max="${full}" value="${val}" class="mt-marks w-24 rounded-lg border border-slate-300 px-2.5 py-1 text-sm focus:ring-2 focus:ring-[#1e4e79] focus:outline-none" placeholder="নম্বর" />
+            </td>
+            <td class="py-2.5 px-3 text-center mt-pct font-semibold">${val !== "" ? pct + "%" : "-"}</td>
+            <td class="py-2.5 px-3 text-center mt-grade font-bold text-[#1e4e79]">${grade}</td>
+            <td class="py-2.5 px-3 text-center mt-gpa">${gpa}</td>
+            <td class="py-2.5 px-3">
+              <input type="text" value="${rem}" class="mt-rem rounded-lg border border-slate-300 px-2 py-1 text-xs w-full" placeholder="মন্তব্য..." />
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.querySelectorAll(".mt-marks").forEach(inp => {
+        inp.addEventListener("input", e => {
+          const tr = e.target.closest("tr");
+          const fullMarks = Number(document.getElementById("mt-full-marks").value) || 25;
+          const v = e.target.value;
+          if (v === "") {
+            tr.querySelector(".mt-pct").textContent = "-";
+            tr.querySelector(".mt-grade").textContent = "-";
+            tr.querySelector(".mt-gpa").textContent = "-";
+            return;
+          }
+          const pct = Math.round((Number(v) / fullMarks) * 100);
+          const { grade, gpa } = getGradeAndGPA(pct);
+          tr.querySelector(".mt-pct").textContent = pct + "%";
+          tr.querySelector(".mt-grade").textContent = grade;
+          tr.querySelector(".mt-gpa").textContent = gpa;
+        });
+      });
+    }
+
+    // ====== 6. REPORT CARD LOGIC ======
+    function updateReportStudents() {
+      const cls = document.getElementById("rc-class").value;
+      const grp = document.getElementById("rc-group").value;
+      const list = STUDENTS.filter(s => s.cls === cls && s.grp === grp);
+      const sel = document.getElementById("rc-student");
+      sel.innerHTML = list.map(s => `<option value="${s.id}">${s.name} (Roll ${s.roll})</option>`).join("");
+      if (list.some(s => s.id === "VK-09-17")) sel.value = "VK-09-17";
+      renderReportCard();
+    }
+
+    function renderReportCard() {
+      const sid = document.getElementById("rc-student").value;
+      const month = document.getElementById("rc-month").value || "নভেম্বর ২০২৬";
+      const student = STUDENTS.find(s => s.id === sid);
+      if (!student) return;
+
+      document.getElementById("rc-student-info").innerHTML = `
+        <div><span class="text-slate-500">শিক্ষার্থীর নাম:</span> <strong class="text-slate-900">${student.name}</strong></div>
+        <div><span class="text-slate-500">আইডি:</span> <strong class="font-mono">${student.id}</strong></div>
+        <div><span class="text-slate-500">রোল নং:</span> <strong>${student.roll}</strong></div>
+        <div><span class="text-slate-500">শ্রেণি:</span> <strong>${student.cls}</strong></div>
+        <div><span class="text-slate-500">বিভাগ:</span> <strong>${student.grp}</strong></div>
+        <div><span class="text-slate-500">মাস:</span> <strong>${month}</strong></div>
+      `;
+
+      const wRows = weeklyRecords.filter(r => r.studentId === sid);
+      const wBody = document.getElementById("rc-weekly-body");
+      if (wRows.length === 0) {
+        wBody.innerHTML = `<tr><td colspan="8" class="border border-slate-300 py-3 text-center text-slate-400">এই শিক্ষার্থীর কোনো সাপ্তাহিক মূল্যায়ন এখনো এন্ট্রি করা হয়নি।</td></tr>`;
+      } else {
+        wBody.innerHTML = wRows.map(r => `
+          <tr>
+            <td class="border border-slate-300 py-1.5 px-2.5">${r.week} (${r.date})</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 font-medium">${r.subject}</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center">${r.att} (${ATT_SCORE[r.att]})</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center">${r.hw} (${HW_SCORE[r.hw]})</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center">${r.cw} (${CW_SCORE[r.cw]})</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center">${r.attn} (${ATTN_SCORE[r.attn]})</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center font-bold">${r.total}</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center font-semibold text-[#1e4e79]">${r.pct}%</td>
+          </tr>
+        `).join("");
+      }
+
+      const mRows = megaRecords.filter(m => m.studentId === sid);
+      const mBody = document.getElementById("rc-mega-body");
+      if (mRows.length === 0) {
+        mBody.innerHTML = `<tr><td colspan="7" class="border border-slate-300 py-3 text-center text-slate-400">এই শিক্ষার্থীর কোনো মেগা টেস্ট ফলাফল এখনো এন্ট্রি করা হয়নি।</td></tr>`;
+      } else {
+        mBody.innerHTML = mRows.map(m => `
+          <tr>
+            <td class="border border-slate-300 py-1.5 px-2.5">${m.exam}</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 font-medium">${m.subject}</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center">${m.full}</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center font-bold">${m.obtained}</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center">${m.pct}%</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center font-bold text-[#1e4e79]">${m.grade}</td>
+            <td class="border border-slate-300 py-1.5 px-2.5 text-center font-semibold">${m.gpa}</td>
+          </tr>
+        `).join("");
+      }
+
+      const avgWk = wRows.length ? Math.round(wRows.reduce((a, b) => a + b.pct, 0) / wRows.length) : 0;
+      const avgMt = mRows.length ? Math.round(mRows.reduce((a, b) => a + b.pct, 0) / mRows.length) : 0;
+      document.getElementById("rc-summary-box").innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div><strong>সার্বিক মূল্যায়ন সারসংক্ষেপ:</strong> সাপ্তাহিক গড় স্কোর <strong>${avgWk}%</strong> | মেগা টেস্ট গড় <strong>${avgMt}%</strong></div>
+          <div class="text-[#1e4e79] font-semibold">${avgMt >= 80 ? "চমৎকার অগ্রগতি — ধরে রাখো!" : avgMt >= 50 ? "সন্তোষজনক — আরও মনোযোগী হও।" : "নিয়মিত অনুশীলন ও উপস্থিতি বাড়াতে হবে।"}</div>
+        </div>
+      `;
+    }
+
+    // ====== 7. DASHBOARD & CSV EXPORT ======
+    function renderDashboard() {
+      document.getElementById("kpi-students").textContent = STUDENTS.length;
+      document.getElementById("kpi-weekly").textContent = weeklyRecords.length;
+      document.getElementById("kpi-mega").textContent = megaRecords.length;
+      const avgW = weeklyRecords.length ? Math.round(weeklyRecords.reduce((a, b) => a + b.pct, 0) / weeklyRecords.length) : 0;
+      document.getElementById("kpi-avg-weekly").textContent = avgW + "%";
+
+      const counts = {};
+      STUDENTS.forEach(s => { counts[s.cls] = (counts[s.cls] || 0) + 1; });
+      const ctx = document.getElementById("classChart").getContext("2d");
+      if (classChartInstance) classChartInstance.destroy();
+      classChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: Object.keys(counts),
+          datasets: [{
+            label: "নিবন্ধিত শিক্ষার্থী",
+            data: Object.values(counts),
+            backgroundColor: "#1e4e79",
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } } }
+        }
+      });
+    }
+
+    function downloadCSV(filename, headers, rows) {
+      const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))].join("\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`${filename} ডাউনলোড হয়েছে!`);
+    }
+
+    function exportWeeklyCSV() {
+      const headers = ["Eval_ID", "Date", "Week", "Class", "Group", "Student_ID", "Student_Name", "Subject", "Teacher_Name", "Attendance", "Homework", "Classwork", "Attention", "Total_Weekly_Score", "Percentage", "Remarks"];
+      const rows = weeklyRecords.map(r => [r.id, r.date, r.week, r.cls, r.grp, r.studentId, r.studentName, r.subject, r.teacher, r.att, r.hw, r.cw, r.attn, r.total, r.pct + "%", r.remarks]);
+      downloadCSV("Vidyakutir_Weekly_Evaluation.csv", headers, rows);
+    }
+
+    function exportMegaCSV() {
+      const headers = ["Test_ID", "Exam_Name", "Exam_Date", "Class", "Group", "Student_ID", "Student_Name", "Subject", "Full_Marks", "Obtained_Marks", "Attendance", "Percentage", "Grade", "GPA", "Teacher_Remarks"];
+      const rows = megaRecords.map(m => [m.id, m.exam, m.date, m.cls, m.grp, m.studentId, m.studentName, m.subject, m.full, m.obtained, m.att, m.pct + "%", m.grade, m.gpa, m.remarks]);
+      downloadCSV("Vidyakutir_Mega_Test_Results.csv", headers, rows);
+    }
+
+    // ====== 8. INIT & EVENT LISTENERS ======
+    document.addEventListener("DOMContentLoaded", () => {
+      const today = "2026-11-12";
+      document.getElementById("wk-date").value = today;
+      document.getElementById("mt-date").value = today;
+
+      populateSelect(document.getElementById("wk-teacher"), TEACHERS);
+
+      syncGroupAndSubject(document.getElementById("wk-class"), document.getElementById("wk-group"), document.getElementById("wk-subject"));
+      syncGroupAndSubject(document.getElementById("mt-class"), document.getElementById("mt-group"), document.getElementById("mt-subject"));
+      syncGroupAndSubject(document.getElementById("rc-class"), document.getElementById("rc-group"), null);
+
+      document.getElementById("wk-class").addEventListener("change", renderWeeklyTable);
+      document.getElementById("wk-group").addEventListener("change", renderWeeklyTable);
+
+      document.getElementById("mt-class").addEventListener("change", renderMegaTable);
+      document.getElementById("mt-group").addEventListener("change", renderMegaTable);
+      document.getElementById("mt-subject").addEventListener("change", renderMegaTable);
+      document.getElementById("mt-full-marks").addEventListener("input", renderMegaTable);
+
+      document.getElementById("rc-class").addEventListener("change", updateReportStudents);
+      document.getElementById("rc-group").addEventListener("change", updateReportStudents);
+      document.getElementById("rc-student").addEventListener("change", renderReportCard);
+      document.getElementById("rc-month").addEventListener("input", renderReportCard);
+
+      // Tab Switching
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+          document.getElementById(`tab-${btn.dataset.tab}`).classList.remove("hidden");
+          if (btn.dataset.tab === "dashboard") renderDashboard();
+          if (btn.dataset.tab === "report") renderReportCard();
+        });
+      });
+
+      // Mark all present
+      document.getElementById("wk-mark-all-present").addEventListener("click", () => {
+        document.querySelectorAll("#wk-table-body tr").forEach(tr => {
+          const att = tr.querySelector(".wk-att");
+          if (att) {
+            att.value = "Present";
+            tr.querySelector(".wk-hw").value = "Complete";
+            tr.querySelector(".wk-cw").value = "Good";
+            tr.querySelector(".wk-attn").value = "Attentive";
+            updateWeeklyRowScore(tr);
+          }
+        });
+        showToast("সকল শিক্ষার্থীকে Present ও Complete হিসেবে চিহ্নিত করা হয়েছে।", "info");
+      });
+
+      // Save Weekly
+      document.getElementById("wk-save-btn").addEventListener("click", () => {
+        const rows = document.querySelectorAll("#wk-table-body tr[data-sid]");
+        if (!rows.length) return;
+        const teacher = document.getElementById("wk-teacher").value;
+        const date = document.getElementById("wk-date").value;
+        const week = document.getElementById("wk-week").value;
+        const cls = document.getElementById("wk-class").value;
+        const grp = document.getElementById("wk-group").value;
+        const subject = document.getElementById("wk-subject").value;
+
+        rows.forEach(tr => {
+          const att = tr.querySelector(".wk-att").value;
+          const hw = tr.querySelector(".wk-hw").value;
+          const cw = tr.querySelector(".wk-cw").value;
+          const attn = tr.querySelector(".wk-attn").value;
+          const total = ATT_SCORE[att] + HW_SCORE[hw] + CW_SCORE[cw] + ATTN_SCORE[attn];
+          weeklyRecords.push({
+            id: "WK-" + Math.floor(1000 + Math.random() * 9000),
+            date, week, cls, grp,
+            studentId: tr.dataset.sid,
+            studentName: tr.dataset.sname,
+            subject, teacher, att, hw, cw, attn,
+            total,
+            pct: Math.round((total / 20) * 100),
+            remarks: tr.querySelector(".wk-rem").value || "-"
+          });
+        });
+        saveState("vk_weekly_records", weeklyRecords);
+        renderSavedWeekly();
+        showToast(`${rows.length} জন শিক্ষার্থীর সাপ্তাহিক মূল্যায়ন সংরক্ষিত হয়েছে!`);
+      });
+
+      // Save Mega Test
+      document.getElementById("mt-save-btn").addEventListener("click", () => {
+        const rows = document.querySelectorAll("#mt-table-body tr[data-sid]");
+        const exam = document.getElementById("mt-exam-name").value;
+        const date = document.getElementById("mt-date").value;
+        const cls = document.getElementById("mt-class").value;
+        const grp = document.getElementById("mt-group").value;
+        const subject = document.getElementById("mt-subject").value;
+        const full = Number(document.getElementById("mt-full-marks").value) || 25;
+
+        let savedCount = 0;
+        rows.forEach(tr => {
+          const marksVal = tr.querySelector(".mt-marks").value;
+          if (marksVal === "") return;
+          const obtained = Number(marksVal);
+          const pct = Math.round((obtained / full) * 100);
+          const { grade, gpa } = getGradeAndGPA(pct);
+          const sid = tr.dataset.sid;
+          megaRecords = megaRecords.filter(m => !(m.studentId === sid && m.subject === subject));
+          megaRecords.push({
+            id: "MT-" + Math.floor(1000 + Math.random() * 9000),
+            exam, date, cls, grp,
+            studentId: sid,
+            studentName: tr.dataset.sname,
+            subject, full, obtained,
+            att: tr.querySelector(".mt-att").value,
+            pct, grade, gpa,
+            remarks: tr.querySelector(".mt-rem").value || "-"
+          });
+          savedCount++;
+        });
+        if (savedCount === 0) {
+          showToast("অনুগ্রহ করে অন্তত একজন শিক্ষার্থীর নম্বর লিখুন।", "error");
+          return;
+        }
+        saveState("vk_mega_records", megaRecords);
+        showToast(`${savedCount} জন শিক্ষার্থীর মেগা টেস্ট নম্বর সংরক্ষিত হয়েছে!`);
+      });
+
+      // Print
+      document.getElementById("print-report-btn").addEventListener("click", () => window.print());
+
+      // Exports
+      document.getElementById("export-weekly-csv").addEventListener("click", exportWeeklyCSV);
+      document.getElementById("dash-export-weekly").addEventListener("click", exportWeeklyCSV);
+      document.getElementById("export-mega-csv").addEventListener("click", exportMegaCSV);
+      document.getElementById("dash-export-mega").addEventListener("click", exportMegaCSV);
+
+      // Copy Apps Script
+      document.getElementById("copy-apps-script").addEventListener("click", () => {
+        const text = document.getElementById("apps-script-code").textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => showToast("Apps Script কোড কপি হয়েছে!")).catch(() => fallbackCopy(text));
+        } else {
+          fallbackCopy(text);
+        }
+      });
+
+      function fallbackCopy(text) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); showToast("Apps Script কোড কপি হয়েছে!"); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      // Initial renders
+      renderWeeklyTable();
+      renderSavedWeekly();
+      renderMegaTable();
+      updateReportStudents();
+    });
+  </script>
+</body>
+</html>
